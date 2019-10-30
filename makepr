@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# As always: http://redsymbol.net/articles/unofficial-bash-strict-mode/
+set -euo pipefail
+IFS=$'\n\t'
+
+branch="$(git rev-parse --abbrev-ref HEAD)"
+
+url="https://github.com/tibiiii/playground/compare/master...$branch?quick_pull=1"
+
+# if [[ "$branch" =~ ^SHAP-[0-9]*_.*$ ]]; then
+    ticket_id="${branch%%_*}"
+    url="$url&body=https%3A%2F%2Fshapr3d.atlassian.net%2Fbrowse%2F$ticket_id&title=[$ticket_id]"
+# fi
+
+open "$url"
