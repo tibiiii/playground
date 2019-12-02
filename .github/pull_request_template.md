@@ -4,6 +4,15 @@
 ## Short description 📖
 <!--- Short description of the change, can include screenshot, gif, etc. -->
 
+### Bug repro steps
+<!--- Should be deleted if not a bug -->
+1.
+2.
+3.
+
+### Bug root cause
+<!--- Should be deleted if not a bug -->
+
 ## Testing
 
 ### Affected areas 🧭
