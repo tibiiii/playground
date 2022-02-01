@@ -18,6 +18,7 @@ git merge "origin/$release_branch"
 # if there are conflicts
 if [[ "$(git status --porcelain --ignore-submodules)" != "" ]]; then
     echo "conflicts!!!!"
+    git status
     git add ./testfile
     git merge --continue
 fi
