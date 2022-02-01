@@ -6,7 +6,7 @@ if [[ "$base_branch" != "master" ]]; then
   echo 'Aborting script, base branch should be master';
   exit 1;
 fi
-merge_branch="merge_release"
+merge_branch="merge_release_2"
 release_branch="release"
 
 git config --global user.name "Shapr3D Dev"
