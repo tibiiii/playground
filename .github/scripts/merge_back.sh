@@ -20,6 +20,11 @@ if [[ "$(git status --porcelain --ignore-submodules)" != "" ]]; then
     echo "conflicts!!!!"
     git status
     cd "$REPO_ROOT"
+
+    echo "pwd:"
+    pwd
+
+    
     git add .
     git merge --continue
 fi
