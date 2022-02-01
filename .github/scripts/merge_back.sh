@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 REPO_ROOT=$(cd "$(dirname "$0")/../.."; pwd)
 
-set -euo pipefail
-IFS=$'\n\t'
-
 base_branch="$(git rev-parse --abbrev-ref HEAD)"
 if [[ "$base_branch" != "master" ]]; then
   echo 'Aborting script, base branch should be master';
