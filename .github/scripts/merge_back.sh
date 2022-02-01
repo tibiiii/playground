@@ -26,7 +26,7 @@ if [[ "$(git status --porcelain --ignore-submodules)" != "" ]]; then
 
     
     git add .
-    git merge --continue
+    git merge --continue --no-edit
 fi
 
 git push -f origin HEAD:"$merge_branch"
