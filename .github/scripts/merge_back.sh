@@ -12,6 +12,9 @@ fi
 merge_branch="merge_release"
 release_branch="release"
 
+git config --global user.name "Shapr3D Dev"
+git config --global user.email "dev@shapr3d.com"
+
 git checkout -b "$merge_branch"
 git merge "origin/$release_branch"
 
