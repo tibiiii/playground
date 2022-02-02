@@ -12,39 +12,42 @@ release_branch="release"
 git config --global user.name "Shapr3D Dev"
 git config --global user.email "dev@shapr3d.com"
 
+# checkout '$release_branch' to have it localy, avoid using 'origin/' for simplicity
+git checkout "$release_branch"
+
 if git show-branch "origin/$merge_branch" &>/dev/null; then
-    # if a `merge_branch` already exists
-    # 1. check if merge without conflict is possible for `master` and `release`
+    # if a 'merge_branch' already exists
+    # 1. check if merge without conflict is possible for 'master' and 'release'
     #    if yes, do the merge and push
     #    if no, abort, merge resolution has to be done manually
 
-    echo "Previous \"origin/$merge_branch\" already exists"
-
+    echo "Previous \"$merge_branch\" already exists"
     git checkout "$merge_branch"
-    git merge --no-commit --no-ff "origin/$base_branch"
-    if git diff --check; then
-        echo "Can't merge $base_branch, there are conflicts to resolve."
-        git merge --abort
-    else
-        echo "can merge"
-        git commit --all --no-edit
-    fi
-    git merge --no-commit --no-ff "origin/$release_branch"
-    if git diff --check; then
-        echo "Can't merge $release_branch, there are conflicts to resolve."
-        git merge --abort
-    elif [[ "$(git status --porcelain --ignore-submodules)" != "" ]]; then
-        git commit --all --no-edit
-    fi
-    git push origin HEAD:"$merge_branch"
-else
-    # if no `merge_branch`
-    # 1. checkout `release`
-    # 2. create new `merge_branch` from `release`
-    # 3. open a PR `merge_branch` -> `master`
-    echo "No previous \"origin/$merge_branch\""
 
-    git checkout "$release_branch"
+    function merge_branch_if_possible () {
+        echo "::group::Merge branch \"$1\""
+
+        git merge --no-commit --no-ff "$1"
+        if git diff --diff-filter=U --check --exit-code; then
+            echo "Can merge \"$1\""
+            git commit --all --no-edit
+            git push origin HEAD:"$merge_branch"
+        else
+            echo "Can't merge \"$1\", there are conflicts to resolve."
+            git merge --abort
+        fi
+        echo "::endgroup::"
+    }
+
+    merge_branch_if_possible "$base_branch"
+    merge_branch_if_possible "$release_branch"
+else
+    # if no 'merge_branch'
+    # 1. checkout 'release'
+    # 2. create new 'merge_branch' from 'release'
+    # 3. open a PR 'merge_branch' -> 'master'
+    echo "No previous \"$merge_branch\""
+
     git checkout -b "$merge_branch"
     git push -f origin HEAD:"$merge_branch"
 
