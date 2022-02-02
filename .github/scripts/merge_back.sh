@@ -9,8 +9,7 @@ fi
 merge_branch="merge_release"
 release_branch="release"
 
-
-if $(git show-branch "origin/$merge_branch"); then
+if git show-branch "origin/merge_release" &>/dev/null; then
     # if a `merge_branch` already exists
     # 1. check if merge without conflict is possible for `master` and `release`
     #    if yes, do the merge and push
@@ -32,7 +31,7 @@ if $(git show-branch "origin/$merge_branch"); then
         git commit --all --no-edit
     fi
     git push "$merge_branch"
-fi
+else
     # if no `merge_branch`
     # 1. checkout `release`
     # 2. create new `merge_branch` from `release`
