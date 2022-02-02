@@ -21,23 +21,19 @@ if git show-branch "origin/$merge_branch" &>/dev/null; then
     echo "Previous \"origin/$merge_branch\" already exists"
 
     git checkout "$merge_branch"
-    git merge --no-commit --no-ff "origin/$base_branch"
-    if git diff --diff-filter=U --check --exit-code; then
-        echo "can merge"
-        git commit --all --no-edit
-    else
-        echo "Can't merge $base_branch, there are conflicts to resolve."
-        git merge --abort
-    fi
+    function merge_branch_if_possible () {
+        git merge --no-commit --no-ff "origin/$1"
+        if git diff --diff-filter=U --check --exit-code; then
+            echo "can merge"
+            git commit --all --no-edit
+        else
+            echo "Can't merge $1, there are conflicts to resolve."
+            git merge --abort
+        fi        
+    }
 
-    git merge --no-commit --no-ff "origin/$release_branch"  
-    if git diff --diff-filter=U --check --exit-code; then
-        echo "can merge"
-        git commit --all --no-edit
-    elif [[ "$(git status --porcelain --ignore-submodules)" != "" ]]; then
-        echo "Can't merge $release_branch, there are conflicts to resolve."
-        git merge --abort
-    fi
+    merge_branch_if_possible $base_branch
+    merge_branch_if_possible $release_branch
 
     git push origin HEAD:"$merge_branch"
 else
