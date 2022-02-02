@@ -22,14 +22,15 @@ if git show-branch "origin/$merge_branch" &>/dev/null; then
 
     git checkout "$merge_branch"
     git merge --no-commit --no-ff "origin/$base_branch"
-    if $(git diff --cached | grep "<<<<<<<<<<<"); then
+    if git diff --check; then
         echo "Can't merge $base_branch, there are conflicts to resolve."
         git merge --abort
-    elif [[ "$(git status --porcelain --ignore-submodules)" != "" ]]; then
+    else
+        echo "can merge"
         git commit --all --no-edit
     fi
     git merge --no-commit --no-ff "origin/$release_branch"
-    if $(git diff --cached | grep "<<<<<<<<<<<"); then
+    if git diff --check; then
         echo "Can't merge $release_branch, there are conflicts to resolve."
         git merge --abort
     elif [[ "$(git status --porcelain --ignore-submodules)" != "" ]]; then
