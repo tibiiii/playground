@@ -8,6 +8,9 @@ if [[ "$base_branch" != "master" ]]; then
 fi
 merge_branch="merge_release"
 release_branch="release"
+base_url="https://api.github.com/repos/tibiiii/playground" #https://api.github.com/repos/shapr3d/shapr3d
+actions_base_url="$base_url/actions"
+pr_base_url="$base_url/pulls"
 
 git config --global user.name "Shapr3D Dev"
 git config --global user.email "dev@shapr3d.com"
@@ -23,6 +26,11 @@ if git show-branch "origin/$merge_branch" &>/dev/null; then
 
     echo "Previous \"$merge_branch\" already exists"
     git checkout "$merge_branch"
+    existing_pull_number=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "$pr_base_url" | jq --arg branch "$merge_branch" --arg base_branch "$base_branch" '.[] | select(.head.ref==$branch and .base.ref==$base_branch) | .number')
+    if [ -z $existing_pull_number ]; then
+        echo "No existing PR open.";
+        exit 1
+    fi
 
     function merge_branch_if_possible () {
         echo "::group::Merge branch \"$1\""
@@ -35,6 +43,11 @@ if git show-branch "origin/$merge_branch" &>/dev/null; then
         else
             echo "Can't merge \"$1\", there are conflicts to resolve."
             git merge --abort
+
+            echo "Comment on PR";
+            curl -s -S -H "Authorization: token $GITHUB_TOKEN" -X POST --data "{\
+                \"body\":\"Could not auto resolve conflicts for \"$1\" in [run]($actions_base_url/runs/1)\"\
+            }" "$pr_base_url/$existing_pull_number/comments" > /dev/null
         fi
         echo "::endgroup::"
     }
@@ -56,5 +69,5 @@ else
         \"title\":\"L10n - update\",\
         \"base\":\"$base_branch\",\
         \"head\":\"$merge_branch\"\
-    }" https://api.github.com/repos/tibiiii/playground/pulls > /dev/null
+    }" "$pr_base_url" > /dev/null
 fi
