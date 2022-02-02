@@ -15,18 +15,9 @@ git config --global user.email "dev@shapr3d.com"
 git checkout -b "$merge_branch"
 git merge "origin/$release_branch"
 
-# if there are conflicts
+# if there are conflicts, add all changes and commit
 if [[ "$(git status --porcelain --ignore-submodules)" != "" ]]; then
-    echo "conflicts!!!!"
-    git status
-    cd "$REPO_ROOT"
-
-    echo "pwd:"
-    pwd
-
-    
-    git add .
-    git merge --continue --no-edit
+    git commit --all --no-edit
 fi
 
 git push -f origin HEAD:"$merge_branch"
