@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+!/usr/bin/env bash
 REPO_ROOT=$(cd "$(dirname "$0")/../.."; pwd)
 
 base_branch="$(git rev-parse --abbrev-ref HEAD)"
@@ -22,21 +22,21 @@ if git show-branch "origin/$merge_branch" &>/dev/null; then
 
     git checkout "$merge_branch"
     git merge --no-commit --no-ff "origin/$base_branch"
-    if git diff --cached --check --exit-code; then
-        echo "Can't merge $base_branch, there are conflicts to resolve."
-        git merge --abort
-    else
+    if git diff --diff-filter=U --check --exit-code; then
         echo "can merge"
         git commit --all --no-edit
+    else
+        echo "Can't merge $base_branch, there are conflicts to resolve."
+        git merge --abort
     fi
 
     git merge --no-commit --no-ff "origin/$release_branch"  
-    if git diff --cached --check --exit-code; then
-        echo "Can't merge $release_branch, there are conflicts to resolve."
-        git merge --abort
-    elif [[ "$(git status --porcelain --ignore-submodules)" != "" ]]; then
+    if git diff --diff-filter=U --check --exit-code; then
         echo "can merge"
         git commit --all --no-edit
+    elif [[ "$(git status --porcelain --ignore-submodules)" != "" ]]; then
+        echo "Can't merge $release_branch, there are conflicts to resolve."
+        git merge --abort
     fi
 
     git push origin HEAD:"$merge_branch"
