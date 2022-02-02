@@ -12,9 +12,12 @@ release_branch="release"
 git config --global user.name "Shapr3D Dev"
 git config --global user.email "dev@shapr3d.com"
 
+# checkout '$release_branch' to have it localy, avoid using 'origin/' for simplicity
+git checkout "$release_branch"
+
 if git show-branch "origin/$merge_branch" &>/dev/null; then
-    # if a `merge_branch` already exists
-    # 1. check if merge without conflict is possible for `master` and `release`
+    # if a 'merge_branch' already exists
+    # 1. check if merge without conflict is possible for 'master' and 'release'
     #    if yes, do the merge and push
     #    if no, abort, merge resolution has to be done manually
 
@@ -36,16 +39,15 @@ if git show-branch "origin/$merge_branch" &>/dev/null; then
         echo "::endgroup::"
     }
 
-    merge_branch_if_possible "origin/$base_branch"
-    merge_branch_if_possible "origin/$release_branch"
+    merge_branch_if_possible "$base_branch"
+    merge_branch_if_possible "$release_branch"
 else
-    # if no `merge_branch`
-    # 1. checkout `release`
-    # 2. create new `merge_branch` from `release`
-    # 3. open a PR `merge_branch` -> `master`
+    # if no 'merge_branch'
+    # 1. checkout 'release'
+    # 2. create new 'merge_branch' from 'release'
+    # 3. open a PR 'merge_branch' -> 'master'
     echo "No previous \"$merge_branch\""
 
-    git checkout "$release_branch"
     git checkout -b "$merge_branch"
     git push -f origin HEAD:"$merge_branch"
 
