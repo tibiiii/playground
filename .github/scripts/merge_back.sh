@@ -36,8 +36,8 @@ if git show-branch "origin/$merge_branch" &>/dev/null; then
         echo "::endgroup::"
     }
 
-    merge_branch_if_possible $base_branch
-    merge_branch_if_possible $release_branch
+    merge_branch_if_possible "origin/$base_branch"
+    merge_branch_if_possible "origin/$release_branch"
 else
     # if no `merge_branch`
     # 1. checkout `release`
