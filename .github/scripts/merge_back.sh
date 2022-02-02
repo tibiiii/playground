@@ -6,20 +6,11 @@ if [[ "$base_branch" != "master" ]]; then
   echo 'Aborting script, base branch should be master';
   exit 1;
 fi
-merge_branch="merge_release_2"
+merge_branch="merge_release"
 release_branch="release"
 
-git config --global user.name "Shapr3D Dev"
-git config --global user.email "dev@shapr3d.com"
-
+git checkout "$release_branch"
 git checkout -b "$merge_branch"
-git merge "origin/$release_branch"
-
-# if there are conflicts, add all changes and commit
-if [[ "$(git status --porcelain --ignore-submodules)" != "" ]]; then
-    git commit --all --no-edit
-fi
-
 git push -f origin HEAD:"$merge_branch"
 
 # Open new PR
