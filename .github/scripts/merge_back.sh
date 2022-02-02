@@ -1,4 +1,4 @@
-!/usr/bin/env bash
+#!/usr/bin/env bash
 REPO_ROOT=$(cd "$(dirname "$0")/../.."; pwd)
 
 base_branch="$(git rev-parse --abbrev-ref HEAD)"
@@ -18,30 +18,32 @@ if git show-branch "origin/$merge_branch" &>/dev/null; then
     #    if yes, do the merge and push
     #    if no, abort, merge resolution has to be done manually
 
-    echo "Previous \"origin/$merge_branch\" already exists"
-
+    echo "Previous \"$merge_branch\" already exists"
     git checkout "$merge_branch"
+
     function merge_branch_if_possible () {
-        git merge --no-commit --no-ff "origin/$1"
+        echo "::group::Merge branch \"$1\""
+
+        git merge --no-commit --no-ff "$1"
         if git diff --diff-filter=U --check --exit-code; then
-            echo "can merge"
+            echo "Can merge \"$1\""
             git commit --all --no-edit
+            git push origin HEAD:"$merge_branch"
         else
-            echo "Can't merge $1, there are conflicts to resolve."
+            echo "Can't merge \"$1\", there are conflicts to resolve."
             git merge --abort
-        fi        
+        fi
+        echo "::endgroup::"
     }
 
     merge_branch_if_possible $base_branch
     merge_branch_if_possible $release_branch
-
-    git push origin HEAD:"$merge_branch"
 else
     # if no `merge_branch`
     # 1. checkout `release`
     # 2. create new `merge_branch` from `release`
     # 3. open a PR `merge_branch` -> `master`
-    echo "No previous \"origin/$merge_branch\""
+    echo "No previous \"$merge_branch\""
 
     git checkout "$release_branch"
     git checkout -b "$merge_branch"
