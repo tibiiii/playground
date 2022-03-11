@@ -35,7 +35,7 @@ jobs:
     runs-on: [ubuntu-latest]
     timeout-minutes: 30
     if: ${{ always() }}
-    needs: [job1, job2, job3]
+    needs: ${{ jobs.* }}
     steps:
       - name: Report failure
         if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
