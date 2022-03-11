@@ -22,18 +22,28 @@ jobs:
       - name: Step 1
         run: |
           echo "step 1"
-
   job3:
     runs-on: [ubuntu-latest]
     timeout-minutes: 30
-    if: ${{ always() }}
-    needs: [job1, job2]
     steps:
       - name: Step 1
         run: |
           echo "step 1"
+          exit 1
+
+  job4:
+    runs-on: [ubuntu-latest]
+    timeout-minutes: 30
+    if: ${{ always() }}
+    needs: [job1, job2, job3]
+    steps:
+      - name: Step 1
+        run: |
           echo "job1 result:"
           echo ${{ needs.job1.result }}
 
           echo "job2 result:"
           echo ${{ needs.job2.result }}
+
+          echo "job3 result:"
+          echo ${{ needs.job3.result }}
