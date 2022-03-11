@@ -2,39 +2,37 @@ name: Merge back
 
 on:
   workflow_dispatch:
-
-concurrency: 
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ !contains(fromJson('["refs/heads/master", "refs/heads/release"]'), github.ref) }}    
+  push:
+    branches:
+      - master
 
 jobs:
-  merge_back:
-    if: github.event_name == 'schedule' || github.event.ref == 'refs/heads/master' || github.event.ref == 'refs/heads/retail_demo' || startsWith(github.event.ref, 'refs/heads/release')
+  job1:
     runs-on: [ubuntu-latest]
     timeout-minutes: 30
-    env:
-      CLEAN: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.clean }}
-      FORCE_CLEAN: ${{ secrets.FORCE_CLEAN }}
     steps:
-      - name: List inputs
+      - name: Step 1
         run: |
-          echo '${{ toJSON(github.event.inputs) }}'
-      - name: Hostname
+          echo "step 1"
+  job2:
+    runs-on: [ubuntu-latest]
+    timeout-minutes: 30
+    steps:
+      - name: Step 1
         run: |
-          echo "Running on: $(hostname)"
-      - name: Checkout repository
-        uses: actions/checkout@v2
-        with:
-          clean: ${{ env.CLEAN }}
-          fetch-depth: 0
-          lfs: true
-          persist-credentials: true
-      - name: Clean
-        if: ${{ env.CLEAN == 'true' }}
+          echo "step 1"
+
+  job3:
+    runs-on: [ubuntu-latest]
+    timeout-minutes: 30
+    if: ${{ always() }}
+    needs: [job1, job2]
+    steps:
+      - name: Step 1
         run: |
-          echo "clean"
-      - name: Run merge back script
-        env:
-          GITHUB_TOKEN: ${{ secrets.SHAPR_GITHUB_TOKEN }}
-        run: |
-          ./.github/scripts/merge_back.sh
+          echo "step 1"
+          echo "job1 result:"
+          echo ${{ needs.job1.result }}
+
+          echo "job2 result:"
+          echo ${{ needs.job2.result }}
